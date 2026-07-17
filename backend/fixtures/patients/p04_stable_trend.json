@@ -1,0 +1,77 @@
+{
+  "patient": {
+    "patient_id": "p04",
+    "name": "Dev Rao (synthetic)",
+    "birth_date": "1975-01-30T00:00:00Z",
+    "sex": "male",
+    "mrn": "MRN-24004"
+  },
+  "encounters": [
+    {
+      "source_resource_id": "p04-enc-1",
+      "encounter_id": "p04-enc-1",
+      "encounter_type": "office_visit",
+      "reason": "hypertension follow-up",
+      "clinical_time": "2026-07-13T11:00:00Z"
+    }
+  ],
+  "conditions": [
+    {
+      "source_resource_id": "p04-cond-1",
+      "display": "Essential hypertension",
+      "code": "I10",
+      "clinical_status": "active",
+      "clinical_time": "2019-08-01T00:00:00Z"
+    }
+  ],
+  "medications": [
+    {
+      "source_resource_id": "p04-med-1",
+      "name": "lisinopril",
+      "dose": "10 mg",
+      "frequency": "daily",
+      "status": "active",
+      "clinical_time": "2019-08-15T00:00:00Z"
+    }
+  ],
+  "observations": [
+    {
+      "source_resource_id": "p04-obs-sbp-1",
+      "metric_code": "sbp",
+      "display": "Systolic blood pressure",
+      "value": 128.0,
+      "unit": "mmHg",
+      "clinical_time": "2025-10-01T10:00:00Z"
+    },
+    {
+      "source_resource_id": "p04-obs-sbp-2",
+      "metric_code": "sbp",
+      "display": "Systolic blood pressure",
+      "value": 126.0,
+      "unit": "mmHg",
+      "clinical_time": "2026-02-01T10:00:00Z"
+    },
+    {
+      "source_resource_id": "p04-obs-sbp-3",
+      "metric_code": "sbp",
+      "display": "Systolic blood pressure",
+      "value": 130.0,
+      "unit": "mmHg",
+      "clinical_time": "2026-06-01T10:00:00Z"
+    }
+  ],
+  "notes": [
+    {
+      "source_resource_id": "p04-note-1",
+      "note_type": "progress",
+      "clinical_time": "2026-02-01T11:00:00Z",
+      "text": "Hypertension stable on lisinopril. BP 126. Plan:\n- Continue current therapy."
+    }
+  ],
+  "current_note": "Subjective: Feels well.\nMedications: Continue lisinopril 10 mg daily.\nAssessment: Hypertension, controlled.\nPlan:\n- Continue current therapy.\n- Follow up in 6 months.",
+  "expected": {
+    "note_review": [],
+    "investigator": [],
+    "suppressed": []
+  }
+}

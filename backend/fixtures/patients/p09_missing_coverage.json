@@ -1,0 +1,65 @@
+{
+  "patient": {
+    "patient_id": "p09",
+    "name": "Ivo Petrov (synthetic)",
+    "birth_date": "1954-08-08T00:00:00Z",
+    "sex": "male",
+    "mrn": "MRN-24009"
+  },
+  "encounters": [
+    {
+      "source_resource_id": "p09-enc-1",
+      "encounter_id": "p09-enc-1",
+      "encounter_type": "office_visit",
+      "reason": "medication check",
+      "clinical_time": "2026-07-15T10:00:00Z"
+    }
+  ],
+  "conditions": [
+    {
+      "source_resource_id": "p09-cond-1",
+      "display": "Essential hypertension",
+      "code": "I10",
+      "clinical_status": "active",
+      "clinical_time": "2018-03-01T00:00:00Z"
+    }
+  ],
+  "medications": [
+    {
+      "source_resource_id": "p09-med-1",
+      "name": "losartan",
+      "dose": "50 mg",
+      "frequency": "daily",
+      "status": "active",
+      "clinical_time": "2024-06-01T00:00:00Z"
+    }
+  ],
+  "observations": [
+    {
+      "source_resource_id": "p09-obs-sbp-1",
+      "metric_code": "sbp",
+      "display": "Systolic blood pressure",
+      "value": 134.0,
+      "unit": "mmHg",
+      "clinical_time": "2026-06-20T10:00:00Z"
+    }
+  ],
+  "notes": [
+    {
+      "source_resource_id": "p09-note-1",
+      "note_type": "progress",
+      "clinical_time": "2026-01-10T10:00:00Z",
+      "text": "Hypertension follow-up on losartan. BP acceptable."
+    }
+  ],
+  "current_note": "Subjective: No complaints.\nMedications: Continue losartan 50 mg daily.\nAssessment: Hypertension. Last potassium was normal.\nPlan:\n- Continue current therapy.",
+  "expected": {
+    "note_review": [
+      "coverage_gap"
+    ],
+    "investigator": [
+      "coverage_gap"
+    ],
+    "suppressed": []
+  }
+}

@@ -1,0 +1,89 @@
+{
+  "resourceType": "Bundle",
+  "type": "transaction",
+  "entry": [
+    {
+      "resource": {
+        "resourceType": "Patient",
+        "id": "aaaa1111-2222-3333-4444-555566667777",
+        "identifier": [
+          {"type": {"coding": [{"code": "MR"}]}, "value": "SYN-MRN-0001"}
+        ],
+        "name": [{"given": ["Test123"], "family": "Synthea456"}],
+        "gender": "female",
+        "birthDate": "1970-04-01"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Encounter",
+        "id": "enc-0001",
+        "type": [{"text": "Wellness visit"}],
+        "period": {"start": "2026-05-01T10:00:00Z"}
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Condition",
+        "id": "cond-0001",
+        "code": {"text": "Type 2 diabetes mellitus", "coding": [{"code": "44054006"}]},
+        "clinicalStatus": {"coding": [{"code": "active"}]},
+        "onsetDateTime": "2020-01-15T00:00:00Z"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "med-0001",
+        "status": "active",
+        "medicationCodeableConcept": {"text": "metformin 500 MG Oral Tablet"},
+        "authoredOn": "2024-02-01T00:00:00Z"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "obs-a1c-1",
+        "code": {"coding": [{"system": "http://loinc.org", "code": "4548-4", "display": "HbA1c"}]},
+        "valueQuantity": {"value": 6.3, "unit": "%"},
+        "effectiveDateTime": "2025-10-01T09:00:00Z"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "obs-a1c-2",
+        "code": {"coding": [{"system": "http://loinc.org", "code": "4548-4", "display": "HbA1c"}]},
+        "valueQuantity": {"value": 7.1, "unit": "%"},
+        "effectiveDateTime": "2026-02-01T09:00:00Z"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "obs-a1c-3",
+        "code": {"coding": [{"system": "http://loinc.org", "code": "4548-4", "display": "HbA1c"}]},
+        "valueQuantity": {"value": 7.9, "unit": "%"},
+        "effectiveDateTime": "2026-06-01T09:00:00Z"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "obs-unmapped",
+        "code": {"coding": [{"system": "http://loinc.org", "code": "9999-9", "display": "Obscure"}]},
+        "valueQuantity": {"value": 1.0, "unit": "u"},
+        "effectiveDateTime": "2026-06-01T09:00:00Z"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Procedure",
+        "id": "proc-0001",
+        "code": {"text": "Colonoscopy", "coding": [{"code": "73761001"}]},
+        "status": "completed",
+        "performedPeriod": {"start": "2023-03-01T08:00:00Z"}
+      }
+    }
+  ]
+}

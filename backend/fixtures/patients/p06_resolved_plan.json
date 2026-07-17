@@ -1,0 +1,70 @@
+{
+  "patient": {
+    "patient_id": "p06",
+    "name": "Finn Adeyemi (synthetic)",
+    "birth_date": "1959-05-02T00:00:00Z",
+    "sex": "male",
+    "mrn": "MRN-24006"
+  },
+  "encounters": [
+    {
+      "source_resource_id": "p06-enc-1",
+      "encounter_id": "p06-enc-1",
+      "encounter_type": "office_visit",
+      "reason": "annual physical",
+      "clinical_time": "2026-07-11T09:00:00Z"
+    }
+  ],
+  "conditions": [
+    {
+      "source_resource_id": "p06-cond-1",
+      "display": "Hyperlipidemia",
+      "code": "E78.5",
+      "clinical_status": "active",
+      "clinical_time": "2023-01-01T00:00:00Z"
+    }
+  ],
+  "medications": [
+    {
+      "source_resource_id": "p06-med-1",
+      "name": "atorvastatin",
+      "dose": "20 mg",
+      "frequency": "nightly",
+      "status": "active",
+      "clinical_time": "2023-01-15T00:00:00Z"
+    }
+  ],
+  "observations": [
+    {
+      "source_resource_id": "p06-obs-ldl-1",
+      "metric_code": "ldl",
+      "display": "LDL cholesterol",
+      "value": 96.0,
+      "unit": "mg/dL",
+      "clinical_time": "2026-05-18T08:00:00Z"
+    }
+  ],
+  "orders": [
+    {
+      "source_resource_id": "p06-ord-1",
+      "order_type": "lab",
+      "display": "Lipid panel",
+      "status": "completed",
+      "clinical_time": "2026-04-20T00:00:00Z"
+    }
+  ],
+  "notes": [
+    {
+      "source_resource_id": "p06-note-1",
+      "note_type": "progress",
+      "clinical_time": "2026-04-20T10:00:00Z",
+      "text": "Hyperlipidemia follow-up. Plan:\n- Order lipid panel before next visit."
+    }
+  ],
+  "current_note": "Subjective: Annual physical, no complaints.\nMedications: Continue atorvastatin 20 mg nightly.\nAssessment: Hyperlipidemia, on therapy.\nPlan:\n- Continue statin.\n- Repeat lipid panel in 1 year.",
+  "expected": {
+    "note_review": [],
+    "investigator": [],
+    "suppressed": []
+  }
+}

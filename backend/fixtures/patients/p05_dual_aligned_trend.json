@@ -1,0 +1,103 @@
+{
+  "patient": {
+    "patient_id": "p05",
+    "name": "Ena Kovac (synthetic)",
+    "birth_date": "1983-09-09T00:00:00Z",
+    "sex": "female",
+    "mrn": "MRN-24005"
+  },
+  "encounters": [
+    {
+      "source_resource_id": "p05-enc-1",
+      "encounter_id": "p05-enc-1",
+      "encounter_type": "office_visit",
+      "reason": "diabetes follow-up",
+      "clinical_time": "2026-07-15T13:00:00Z"
+    }
+  ],
+  "conditions": [
+    {
+      "source_resource_id": "p05-cond-1",
+      "display": "Type 2 diabetes mellitus",
+      "code": "E11.9",
+      "clinical_status": "active",
+      "clinical_time": "2022-03-01T00:00:00Z"
+    }
+  ],
+  "medications": [
+    {
+      "source_resource_id": "p05-med-1",
+      "name": "metformin",
+      "dose": "1000 mg",
+      "frequency": "twice daily",
+      "status": "active",
+      "clinical_time": "2022-03-15T00:00:00Z"
+    }
+  ],
+  "observations": [
+    {
+      "source_resource_id": "p05-obs-hba1c-1",
+      "metric_code": "hba1c",
+      "display": "Hemoglobin A1c",
+      "value": 6.4,
+      "unit": "%",
+      "clinical_time": "2025-11-05T09:00:00Z"
+    },
+    {
+      "source_resource_id": "p05-obs-hba1c-2",
+      "metric_code": "hba1c",
+      "display": "Hemoglobin A1c",
+      "value": 7.2,
+      "unit": "%",
+      "clinical_time": "2026-03-05T09:00:00Z"
+    },
+    {
+      "source_resource_id": "p05-obs-hba1c-3",
+      "metric_code": "hba1c",
+      "display": "Hemoglobin A1c",
+      "value": 8.0,
+      "unit": "%",
+      "clinical_time": "2026-07-05T09:00:00Z"
+    },
+    {
+      "source_resource_id": "p05-obs-weight-1",
+      "metric_code": "weight",
+      "display": "Body weight",
+      "value": 82.0,
+      "unit": "kg",
+      "clinical_time": "2025-11-05T09:00:00Z"
+    },
+    {
+      "source_resource_id": "p05-obs-weight-2",
+      "metric_code": "weight",
+      "display": "Body weight",
+      "value": 86.0,
+      "unit": "kg",
+      "clinical_time": "2026-03-05T09:00:00Z"
+    },
+    {
+      "source_resource_id": "p05-obs-weight-3",
+      "metric_code": "weight",
+      "display": "Body weight",
+      "value": 90.0,
+      "unit": "kg",
+      "clinical_time": "2026-07-05T09:00:00Z"
+    }
+  ],
+  "notes": [
+    {
+      "source_resource_id": "p05-note-1",
+      "note_type": "progress",
+      "clinical_time": "2026-03-05T10:00:00Z",
+      "text": "Diabetes follow-up. A1c 7.1 and weight up 4 kg. Counseled on nutrition. Plan:\n- Recheck A1c in 4 months."
+    }
+  ],
+  "current_note": "Subjective: Reports increased appetite.\nMedications: Continue metformin 1000 mg twice daily.\nAssessment: Type 2 diabetes.\nPlan:\n- Follow up in 4 months.",
+  "expected": {
+    "note_review": [],
+    "investigator": [
+      "dual_trend"
+    ],
+    "suppressed": []
+  }
+}

@@ -1,0 +1,74 @@
+{
+  "patient": {
+    "patient_id": "p01",
+    "name": "Ava Stone (synthetic)",
+    "birth_date": "1961-03-04T00:00:00Z",
+    "sex": "female",
+    "mrn": "MRN-24001"
+  },
+  "encounters": [
+    {
+      "source_resource_id": "p01-enc-1",
+      "encounter_id": "p01-enc-1",
+      "encounter_type": "office_visit",
+      "reason": "diabetes follow-up",
+      "clinical_time": "2026-07-10T14:00:00Z"
+    }
+  ],
+  "conditions": [
+    {
+      "source_resource_id": "p01-cond-1",
+      "display": "Type 2 diabetes mellitus",
+      "code": "E11.9",
+      "clinical_status": "active",
+      "clinical_time": "2021-05-01T00:00:00Z"
+    }
+  ],
+  "medications": [
+    {
+      "source_resource_id": "p01-med-1",
+      "name": "metformin",
+      "dose": "500 mg",
+      "frequency": "twice daily",
+      "status": "stopped",
+      "clinical_time": "2026-05-20T00:00:00Z",
+      "raw_source_json": {
+        "stop_reason": "GI intolerance"
+      }
+    },
+    {
+      "source_resource_id": "p01-med-2",
+      "name": "glipizide",
+      "dose": "5 mg",
+      "frequency": "daily",
+      "status": "active",
+      "clinical_time": "2026-05-20T00:00:00Z"
+    }
+  ],
+  "observations": [
+    {
+      "source_resource_id": "p01-obs-hba1c-1",
+      "metric_code": "hba1c",
+      "display": "Hemoglobin A1c",
+      "value": 7.1,
+      "unit": "%",
+      "clinical_time": "2026-05-15T09:00:00Z"
+    }
+  ],
+  "notes": [
+    {
+      "source_resource_id": "p01-note-1",
+      "note_type": "progress",
+      "clinical_time": "2026-05-20T15:00:00Z",
+      "text": "Follow-up for type 2 diabetes. Metformin stopped today due to GI intolerance. Started glipizide 5 mg daily. Plan:\n- Recheck A1c in 3 months."
+    }
+  ],
+  "current_note": "Subjective: Feels well. Diabetes follow-up.\nMedications: Continue metformin 500 mg twice daily.\nAssessment: Type 2 diabetes, stable.\nPlan:\n- Recheck A1c in 3 months.",
+  "expected": {
+    "note_review": [
+      "medication_mismatch"
+    ],
+    "investigator": [],
+    "suppressed": []
+  }
+}

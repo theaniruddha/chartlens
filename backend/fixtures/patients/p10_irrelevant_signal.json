@@ -1,0 +1,67 @@
+{
+  "patient": {
+    "patient_id": "p10",
+    "name": "Jae Park (synthetic)",
+    "birth_date": "1990-02-11T00:00:00Z",
+    "sex": "male",
+    "mrn": "MRN-24010"
+  },
+  "encounters": [
+    {
+      "source_resource_id": "p10-enc-1",
+      "encounter_id": "p10-enc-1",
+      "encounter_type": "office_visit",
+      "reason": "knee pain",
+      "clinical_time": "2026-07-15T14:00:00Z"
+    }
+  ],
+  "conditions": [
+    {
+      "source_resource_id": "p10-cond-1",
+      "display": "Ankle sprain",
+      "code": "S93.4",
+      "clinical_status": "resolved",
+      "clinical_time": "2024-09-01T00:00:00Z"
+    }
+  ],
+  "observations": [
+    {
+      "source_resource_id": "p10-obs-sbp-1",
+      "metric_code": "sbp",
+      "display": "Systolic blood pressure",
+      "value": 118.0,
+      "unit": "mmHg",
+      "clinical_time": "2025-08-01T10:00:00Z"
+    },
+    {
+      "source_resource_id": "p10-obs-sbp-2",
+      "metric_code": "sbp",
+      "display": "Systolic blood pressure",
+      "value": 120.0,
+      "unit": "mmHg",
+      "clinical_time": "2026-02-01T10:00:00Z"
+    },
+    {
+      "source_resource_id": "p10-obs-sbp-3",
+      "metric_code": "sbp",
+      "display": "Systolic blood pressure",
+      "value": 119.0,
+      "unit": "mmHg",
+      "clinical_time": "2026-07-01T10:00:00Z"
+    }
+  ],
+  "notes": [
+    {
+      "source_resource_id": "p10-note-1",
+      "note_type": "progress",
+      "clinical_time": "2024-09-01T10:00:00Z",
+      "text": "Ankle sprain after basketball. RICE advised. Resolved at follow-up."
+    }
+  ],
+  "current_note": "Subjective: Two weeks of right knee pain after running.\nAssessment: Likely patellofemoral pain.\nPlan:\n- Activity modification and quadriceps strengthening.\n- Follow up if not improving in 4 weeks.",
+  "expected": {
+    "note_review": [],
+    "investigator": [],
+    "suppressed": []
+  }
+}

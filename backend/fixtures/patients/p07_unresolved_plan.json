@@ -1,0 +1,61 @@
+{
+  "patient": {
+    "patient_id": "p07",
+    "name": "Gia Moretti (synthetic)",
+    "birth_date": "1971-12-18T00:00:00Z",
+    "sex": "female",
+    "mrn": "MRN-24007"
+  },
+  "encounters": [
+    {
+      "source_resource_id": "p07-enc-1",
+      "encounter_id": "p07-enc-1",
+      "encounter_type": "office_visit",
+      "reason": "follow-up",
+      "clinical_time": "2026-07-09T15:00:00Z"
+    }
+  ],
+  "conditions": [
+    {
+      "source_resource_id": "p07-cond-1",
+      "display": "Iron deficiency anemia",
+      "code": "D50.9",
+      "clinical_status": "active",
+      "clinical_time": "2025-12-01T00:00:00Z"
+    }
+  ],
+  "medications": [
+    {
+      "source_resource_id": "p07-med-1",
+      "name": "ferrous sulfate",
+      "dose": "325 mg",
+      "frequency": "daily",
+      "status": "active",
+      "clinical_time": "2025-12-10T00:00:00Z"
+    }
+  ],
+  "notes": [
+    {
+      "source_resource_id": "p07-note-1",
+      "note_type": "progress",
+      "clinical_time": "2026-01-15T10:00:00Z",
+      "text": "New iron deficiency anemia. Plan:\n- Schedule colonoscopy to evaluate for GI source.\n- Start ferrous sulfate 325 mg daily."
+    },
+    {
+      "source_resource_id": "p07-note-2",
+      "note_type": "progress",
+      "clinical_time": "2026-04-10T10:00:00Z",
+      "text": "Anemia follow-up. Tolerating iron. Hemoglobin improving."
+    }
+  ],
+  "current_note": "Subjective: Feels less fatigued.\nMedications: Continue ferrous sulfate 325 mg daily.\nAssessment: Iron deficiency anemia, improving.\nPlan:\n- Recheck CBC in 3 months.",
+  "expected": {
+    "note_review": [
+      "unresolved_plan"
+    ],
+    "investigator": [
+      "unresolved_plan"
+    ],
+    "suppressed": []
+  }
+}

@@ -1,0 +1,54 @@
+{
+  "patient": {
+    "patient_id": "p02",
+    "name": "Ben Ortiz (synthetic)",
+    "birth_date": "1979-11-22T00:00:00Z",
+    "sex": "male",
+    "mrn": "MRN-24002"
+  },
+  "encounters": [
+    {
+      "source_resource_id": "p02-enc-1",
+      "encounter_id": "p02-enc-1",
+      "encounter_type": "office_visit",
+      "reason": "sinus congestion",
+      "clinical_time": "2026-07-12T10:00:00Z"
+    }
+  ],
+  "allergies": [
+    {
+      "source_resource_id": "p02-alg-1",
+      "substance": "penicillin",
+      "reaction": "hives",
+      "severity": "moderate",
+      "status": "active",
+      "clinical_time": "2015-06-01T00:00:00Z"
+    }
+  ],
+  "medications": [
+    {
+      "source_resource_id": "p02-med-1",
+      "name": "loratadine",
+      "dose": "10 mg",
+      "frequency": "daily",
+      "status": "active",
+      "clinical_time": "2025-04-01T00:00:00Z"
+    }
+  ],
+  "notes": [
+    {
+      "source_resource_id": "p02-note-1",
+      "note_type": "progress",
+      "clinical_time": "2026-03-02T11:00:00Z",
+      "text": "Seasonal allergies, continue loratadine. Allergy list reviewed: penicillin (hives)."
+    }
+  ],
+  "current_note": "Subjective: 10 days of sinus pain and purulent drainage.\nAssessment: Acute bacterial sinusitis suspected.\nPlan:\n- Start amoxicillin 500 mg three times daily for 10 days.\n- Supportive care.",
+  "expected": {
+    "note_review": [
+      "allergy_conflict"
+    ],
+    "investigator": [],
+    "suppressed": []
+  }
+}

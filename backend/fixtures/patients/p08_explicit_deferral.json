@@ -1,0 +1,47 @@
+{
+  "patient": {
+    "patient_id": "p08",
+    "name": "Hana Suzuki (synthetic)",
+    "birth_date": "1966-04-25T00:00:00Z",
+    "sex": "female",
+    "mrn": "MRN-24008"
+  },
+  "encounters": [
+    {
+      "source_resource_id": "p08-enc-1",
+      "encounter_id": "p08-enc-1",
+      "encounter_type": "office_visit",
+      "reason": "preventive care",
+      "clinical_time": "2026-07-14T16:00:00Z"
+    }
+  ],
+  "notes": [
+    {
+      "source_resource_id": "p08-note-1",
+      "note_type": "progress",
+      "clinical_time": "2026-02-20T10:00:00Z",
+      "text": "Preventive care visit. Discussed colorectal cancer screening. Patient declines colonoscopy at this time; defer discussion for 6 months. Plan:\n- Schedule colonoscopy when patient is ready."
+    }
+  ],
+  "deferrals": [
+    {
+      "source_resource_id": "p08-def-1",
+      "topic": "colonoscopy",
+      "reason": "patient declined at 2026-02 visit",
+      "deferred_until": "2026-08-20T00:00:00Z",
+      "evidence_note_id": "p08-note-1",
+      "status": "active",
+      "clinical_time": "2026-02-20T10:00:00Z"
+    }
+  ],
+  "current_note": "Subjective: Here for preventive care.\nAssessment: Health maintenance.\nPlan:\n- Review screening at next visit.",
+  "expected": {
+    "note_review": [],
+    "investigator": [
+      "deferred_topic"
+    ],
+    "suppressed": [
+      "colonoscopy"
+    ]
+  }
+}
