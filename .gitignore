@@ -9,3 +9,8 @@ node_modules/
 frontend/dist/
 *.log
 synthea_output/
+CLAUDE.md
+README_2.md
+.env.example
+README_1.md
+

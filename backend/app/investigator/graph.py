@@ -2,16 +2,20 @@
 
 Topology:
     load_context -> scan_signals -> make_hypotheses -> supervisor
-    supervisor -> (investigate_trend | investigate_plan | investigate_coverage) -> supervisor
+    supervisor -> (investigate_trend | investigate_plan | investigate_coverage
+                   | investigate_symptom) -> supervisor
     supervisor -> finalize (deferral suppression + evidence gate + emit)
 
-Budgets are enforced in state, not prompts: max 9 tool calls, max depth 2 per
-hypothesis, max 3 investigated hypotheses (parallel branches). The supervisor
-is the only routing node and routing is deterministic (typed hypotheses have a
-fixed priority), so model calls are reserved for semantic verification needs.
+Budgets are enforced in state, not prompts: max 9 tool calls and max 3
+investigated hypotheses (parallel branches). MAX_DEPTH bounds only the trend
+node's optional related-metric deepen step (depth 2); every other specialist
+node makes a single tool call (depth 1). The supervisor is the only routing
+node and routing is deterministic (typed hypotheses have a fixed priority),
+so model calls are reserved for semantic verification needs.
 """
 
 import uuid
+from collections.abc import Hashable
 from datetime import UTC, datetime
 from typing import Any, TypedDict
 
@@ -26,11 +30,17 @@ from app.timeutil import utc_iso
 from app.tools.semantic_tools import TOOLS
 
 MAX_TOOL_CALLS = 9
-MAX_DEPTH = 2
+MAX_DEPTH = 2  # bounds only the trend node's related-metric deepen step
 MAX_BRANCHES = 3
 MAX_ITEMS = 4
 
-_PRIORITY = {"trend": 0, "unresolved_plan": 1, "coverage_gap": 2, "symptom_followup": 3}
+# Single source of truth: hypothesis type -> (finding kind, route node, priority).
+_HYP_SPEC: dict[str, tuple[str, str, int]] = {
+    "trend": ("trend", "investigate_trend", 0),
+    "plan": ("unresolved_plan", "investigate_plan", 1),
+    "coverage": ("coverage_gap", "investigate_coverage", 2),
+    "symptom": ("symptom_followup", "investigate_symptom", 3),
+}
 
 
 class InvestigatorState(TypedDict, total=False):
@@ -202,7 +212,7 @@ def build_graph(repo: ChartRepository, provider: Any = None):
                 }
             )
 
-        hyps.sort(key=lambda h: _PRIORITY.get(_hyp_kind(h), 9))
+        hyps.sort(key=lambda h: _HYP_SPEC[h["type"]][2])
         state["hypotheses"] = hyps
         state["steps"].append(
             {
@@ -260,12 +270,7 @@ def build_graph(repo: ChartRepository, provider: Any = None):
         if state["next_hypothesis"] is None:
             return "finalize"
         hyp = state["hypotheses"][state["next_hypothesis"]]
-        return {
-            "trend": "investigate_trend",
-            "plan": "investigate_plan",
-            "coverage": "investigate_coverage",
-            "symptom": "investigate_symptom",
-        }[hyp["type"]]
+        return _HYP_SPEC[hyp["type"]][1]
 
     def investigate_trend(state: InvestigatorState) -> InvestigatorState:
         assert state["next_hypothesis"] is not None
@@ -274,8 +279,11 @@ def build_graph(repo: ChartRepository, provider: Any = None):
         series = tools.call(
             state, "investigate_trend", "get_metric_series", metric_code=code
         )
+        if series is None:
+            hyp["status"] = "budget_exhausted"
+            return state
         hyp["depth"] = 1
-        evidence = [p["evidence_id"] for p in (series or {"points": []})["points"][-3:]]
+        evidence = [p["evidence_id"] for p in series["points"][-3:]]
         related_aligned = None
         if state["tool_calls_used"] < MAX_TOOL_CALLS and hyp["depth"] < MAX_DEPTH:
             related = tools.call(
@@ -283,7 +291,7 @@ def build_graph(repo: ChartRepository, provider: Any = None):
             )
             hyp["depth"] = 2
             snap = hyp["snapshot"]
-            for rel in (related or {"related": []})["related"]:
+            for rel in (related["related"] if related is not None else []):
                 rel_n = rel.get("n_points") or 0
                 rel_slope = rel.get("slope_per_month")
                 if rel_slope is None or rel_n < 3:
@@ -330,7 +338,7 @@ def build_graph(repo: ChartRepository, provider: Any = None):
                     "category": "trend",
                     "metric_code": snap["metric_code"],
                     "snapshot": snap,
-                    "series_points": (series or {"points": []})["points"],
+                    "series_points": series["points"],
                     "evidence_ids": [snap["evidence_id"], *evidence],
                     "source_dates": [d for d in [snap.get("latest_time")] if d],
                 }
@@ -348,10 +356,11 @@ def build_graph(repo: ChartRepository, provider: Any = None):
             topic=hyp["topic"],
             since=cand["note_time"],
         )
+        if resolution is None:
+            hyp["status"] = "budget_exhausted"
+            return state
         hyp["depth"] = 1
         hyp["status"] = "done"
-        if resolution is None:
-            return state
         if not resolution["resolved"]:
             state["findings"].append(
                 {
@@ -370,11 +379,15 @@ def build_graph(repo: ChartRepository, provider: Any = None):
         hits = tools.call(
             state, "investigate_coverage", "search_prior_notes", query=hyp["raw_term"]
         )
+        if hits is None:
+            hyp["status"] = "budget_exhausted"
+            return state
         hyp["depth"] = 1
         hyp["status"] = "done"
-        prior_mention = None
-        if hits and hits["found"]:
-            prior_mention = hits["hits"][0]
+        prior_mention = hits["hits"][0] if hits["found"] else None
+        # A coverage gap is intrinsically about absence: with no prior mention
+        # the only anchor is fallback context evidence, so the finding is kept
+        # but flagged weak (surfaces as confidence="low").
         state["findings"].append(
             {
                 "category": "coverage_gap",
@@ -382,6 +395,7 @@ def build_graph(repo: ChartRepository, provider: Any = None):
                 "raw_term": hyp["raw_term"],
                 "qualifier": hyp.get("qualifier"),
                 "prior_mention": prior_mention,
+                "weak_evidence": prior_mention is None,
                 "evidence_ids": [
                     prior_mention["evidence_id"] if prior_mention else _fallback_evidence(repo)
                 ],
@@ -396,15 +410,20 @@ def build_graph(repo: ChartRepository, provider: Any = None):
         hits = tools.call(
             state, "investigate_symptom", "search_prior_notes", query=hyp["term"]
         )
+        if hits is None:
+            hyp["status"] = "budget_exhausted"
+            return state
         hyp["depth"] = 1
         hyp["status"] = "done"
-        evidence = [h["evidence_id"] for h in (hits or {"hits": []})["hits"][:2]]
-        dates = [h["time"] for h in (hits or {"hits": []})["hits"][:2] if h.get("time")]
+        evidence = [h["evidence_id"] for h in hits["hits"][:2]]
+        dates = [h["time"] for h in hits["hits"][:2] if h.get("time")]
         if not evidence and hyp.get("evidence_id"):
             evidence = [hyp["evidence_id"]]
             dates = [hyp["note_time"]] if hyp.get("note_time") else []
         if not evidence:
-            evidence = [_fallback_evidence(repo)]
+            # No record anchors this symptom; drop it rather than emit an item
+            # backed only by fallback evidence.
+            return state
         state["findings"].append(
             {
                 "category": "symptom_followup",
@@ -440,7 +459,7 @@ def build_graph(repo: ChartRepository, provider: Any = None):
                             + ". Available records include a documented deferral. "
                             "Consider reviewing timing before revisiting it."
                         ),
-                        confidence="high",
+                        confidence=_confidence({"evidence_ids": evidence}),
                         evidence_ids=evidence,
                         source_dates=[until] if until else [],
                         limitations=DEFAULT_LIMITATIONS,
@@ -486,17 +505,9 @@ def build_graph(repo: ChartRepository, provider: Any = None):
     graph.add_edge("load_context", "scan_signals")
     graph.add_edge("scan_signals", "make_hypotheses")
     graph.add_edge("make_hypotheses", "supervisor")
-    graph.add_conditional_edges(
-        "supervisor",
-        route,
-        {
-            "investigate_trend": "investigate_trend",
-            "investigate_plan": "investigate_plan",
-            "investigate_coverage": "investigate_coverage",
-            "investigate_symptom": "investigate_symptom",
-            "finalize": "finalize",
-        },
-    )
+    route_map: dict[Hashable, str] = {node: node for _, node, _ in _HYP_SPEC.values()}
+    route_map["finalize"] = "finalize"
+    graph.add_conditional_edges("supervisor", route, route_map)
     graph.add_edge("investigate_trend", "supervisor")
     graph.add_edge("investigate_plan", "supervisor")
     graph.add_edge("investigate_coverage", "supervisor")
@@ -506,12 +517,18 @@ def build_graph(repo: ChartRepository, provider: Any = None):
 
 
 def _hyp_kind(hyp: dict) -> str:
-    return {
-        "trend": "trend",
-        "plan": "unresolved_plan",
-        "coverage": "coverage_gap",
-        "symptom": "symptom_followup",
-    }[hyp["type"]]
+    return _HYP_SPEC[hyp["type"]][0]
+
+
+def _confidence(f: dict) -> str:
+    """Evidence-strength confidence: fallback/weak evidence is always low,
+    multiple distinct record IDs are high, a single record ID is medium."""
+    if f.get("weak_evidence"):
+        return "low"
+    ids = {e for e in f.get("evidence_ids", []) if e}
+    if len(ids) >= 2:
+        return "high"
+    return "medium" if ids else "low"
 
 
 def _build_coverage_report(repo: ChartRepository, state: InvestigatorState) -> dict:
@@ -554,7 +571,9 @@ def _build_coverage_report(repo: ChartRepository, state: InvestigatorState) -> d
             if h["status"] in ("suppressed", "suppressed_draft")
         ),
         "hypotheses_skipped": sum(
-            1 for h in state.get("hypotheses", []) if h["status"] == "skipped"
+            1
+            for h in state.get("hypotheses", [])
+            if h["status"] in ("skipped", "budget_exhausted")
         ),
         "tools_used": sorted({s["action"] for s in state.get("steps", []) if s["action"] in TOOLS}),
         "limitations": "Coverage reflects connected synthetic records only.",
@@ -648,7 +667,7 @@ def _finding_to_item(f: dict) -> ReviewItem:
                 f"{snap['n_points']} results (about {round(snap['slope_per_month'], 2)} "
                 f"{snap.get('unit') or ''} per month). Consider reviewing this trend."
             ),
-            confidence="high",
+            confidence=_confidence(f),
             evidence_ids=f["evidence_ids"],
             source_dates=dates,
             limitations=DEFAULT_LIMITATIONS,
@@ -666,7 +685,7 @@ def _finding_to_item(f: dict) -> ReviewItem:
                 f"{rel.get('unit') or ''}/month) moving in the same direction over the same "
                 f"period. Consider reviewing these together."
             ),
-            confidence="high",
+            confidence=_confidence(f),
             evidence_ids=f["evidence_ids"],
             source_dates=dates,
             limitations=DEFAULT_LIMITATIONS,
@@ -683,7 +702,7 @@ def _finding_to_item(f: dict) -> ReviewItem:
                 f"{label}, and no matching completion was found in connected records since "
                 f"that date. Consider reviewing its status."
             ),
-            confidence="high",
+            confidence=_confidence(f),
             evidence_ids=f["evidence_ids"],
             source_dates=dates,
             limitations=DEFAULT_LIMITATIONS,
@@ -701,7 +720,7 @@ def _finding_to_item(f: dict) -> ReviewItem:
                 f"found in connected records. Consider reviewing whether this topic "
                 f"needs a follow-up entry."
             ),
-            confidence="medium",
+            confidence=_confidence(f),
             evidence_ids=f["evidence_ids"],
             source_dates=dates,
             limitations=DEFAULT_LIMITATIONS,
@@ -717,7 +736,7 @@ def _finding_to_item(f: dict) -> ReviewItem:
             + ", but no matching result was found in connected records. "
             "Consider reviewing whether this value is documented elsewhere."
         ),
-        confidence="high",
+        confidence=_confidence(f),
         evidence_ids=f["evidence_ids"],
         source_dates=dates,
         limitations=DEFAULT_LIMITATIONS,
