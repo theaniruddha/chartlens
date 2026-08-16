@@ -4,11 +4,9 @@
 
 **ChartLens is a synthetic-data prototype for a patient-context sidecar that helps clinicians find relevant information faster, identify meaningful changes across the chart, and validate AI-generated documentation against patient-specific evidence.**
 
-It is built around a simple observation: clinicians often have only a short window to understand a patient, while relevant information can be spread across encounters, observations, medications, conditions, prior notes, plans, and other connected systems.
+Clinicians often have only a short window (PCP's have 1 to 3 minutes on avg in Canada) to understand a patient. Relevant information can be spread across encounters, observations, medications, conditions, prior notes, plans, and other connected systems.a
 
-The problem is not only finding one record. It is **connecting the right pieces of information at the right time**.
-
-ChartLens explores how a deterministic signal layer plus bounded agentic reasoning can do some of that work quietly in the background, while keeping the clinician in control.
+ChartLens explores how a deterministic signal layer and bounded agentic reasoning can collect that context, investigate meaningful changes, and present the result for review while keeping the clinician in control.
 
 > **Prototype, not a clinical product.** All data is synthetic. The system does not diagnose, prescribe, assign urgency, or recommend patient contact.
 
@@ -74,9 +72,7 @@ EHR / labs / medications / prior notes / other connected sources
                        clinical workflows
 ```
 
-The goal is not to replace the EHR.
-
-The idea is a **sidecar layer** that can co-locate relevant information from existing systems and present it for review.
+ChartLens is designed as a **sidecar layer** beside the EHR. It brings relevant information from existing systems into one reviewable context.
 
 In a production setting, the input layer could connect to available HL7, FHIR, EHR, laboratory, medication, and other clinical interfaces. This prototype uses synthetic data and a normalized internal model instead.
 
@@ -119,13 +115,11 @@ Evidence-linked review
 Clinician decides
 ```
 
-The purpose is not to replace ambient documentation.
-
-The prototype explores the **next layer of trust**: once an AI system creates a note, can patient-specific context help identify things that should be reviewed before the note is finalized?
+Ambient documentation creates the draft note. ChartLens adds a patient-specific validation step before the note is finalized. It checks whether the generated documentation is consistent with the available record.
 
 For example, if speech is converted into a fluent note but a medication, value, duration, or clinical term differs from the available patient record, the system can flag the discrepancy for review.
 
-The same validation layer could eventually work alongside autocomplete or voice-driven documentation rather than requiring a separate clinician workflow.
+The same validation layer could run alongside autocomplete or voice-driven documentation and return review points inside the existing workflow.
 
 ---
 
@@ -163,7 +157,7 @@ The prototype tracks deterministic signals such as:
 - plans
 - prior notes
 
-The agent does not start by asking an LLM to summarize the entire chart. It starts from signals and investigates whether an unusual or potentially important change is:
+The agent starts from deterministic signals and investigates whether an unusual or potentially important change is:
 
 - isolated or persistent
 - part of a longer-term pattern
@@ -202,9 +196,9 @@ Evidence-backed review item
 Clinician decides
 ```
 
-This is **cross-signal correlation and evidence synthesis**, not causal inference.
+The prototype performs **cross-signal correlation and evidence synthesis**. It does not perform causal inference.
 
-The agent can investigate known domain relationships without turning them into automatic clinical recommendations. For example, a clinic-defined medication signal pack could associate a newly documented medication with relevant patient measurements and then check whether those measurements are available, current, changing, or inconsistent with the record. The system surfaces the evidence for review rather than deciding what the clinician should do.
+The agent can investigate validated domain relationships and surface the relevant patient evidence. For example, a clinic-defined medication signal pack could associate a newly documented medication with relevant patient measurements and check whether those measurements are present, current, changing, or inconsistent with the record. The clinician reviews the result and decides what to do.
 
 ## 3. Documentation linting
 
@@ -269,9 +263,7 @@ ChartLens can independently identify:
    the stated purpose does not match the local drug reference.
 ```
 
-The result is not a diagnosis or treatment recommendation.
-
-It is:
+The result contains:
 
 ```text
 Finding
@@ -287,7 +279,7 @@ The clinician decides what to do.
 
 # Why deterministic signals + agents?
 
-The prototype deliberately separates **what can be computed reliably** from **where semantic reasoning is useful**.
+The architecture gives deterministic logic and semantic reasoning different jobs.
 
 ### Deterministic layer
 
@@ -323,15 +315,15 @@ The LLM is deliberately narrow.
 
 It is used for semantic tasks where deterministic logic is insufficient, such as interpreting whether wording like "stable" is consistent with a derived trend.
 
-This gives the system a simple principle:
+The design principle is:
 
-> **Deterministic where possible. Agentic where useful. LLM where semantic judgment is required.**
+> **Use deterministic logic for measurable signals. Use agents to investigate relationships. Use LLMs for semantic judgment.**
 
 ---
 
 # Unintrusive by design
 
-The clinician should not have to manage an AI agent.
+The clinician interacts with the review result, not the underlying agent.
 
 The intended interaction is closer to a sidecar:
 
@@ -349,7 +341,7 @@ Clinician workflow
                     Decide
 ```
 
-The system is designed to surface **evidence-backed items**, not continuously generate commentary.
+The system surfaces **evidence-backed items** when there is enough signal to warrant review.
 
 Agent execution is bounded in graph state:
 
@@ -358,13 +350,13 @@ Agent execution is bounded in graph state:
 - maximum 3 investigated branches
 - maximum 4 review items
 
-If the budget is exhausted, the system does not emit a partial finding.
+When the budget is exhausted, the system suppresses the partial finding.
 
 ---
 
 # Potential extensions
 
-The prototype intentionally focuses on the underlying patient-context and validation layer.
+The current prototype focuses on the patient-context and validation layer.
 
 The same foundation could support additional clinic or specialty capabilities.
 
@@ -434,7 +426,7 @@ Examples include possible transcription changes to:
 - anatomical terms
 - symptoms or other patient-specific terminology
 
-The goal is not to decide that a transcription is wrong. It is to detect when the generated note conflicts with available patient evidence and give the clinician a quick review point.
+The goal is to detect when generated documentation conflicts with available patient evidence and give the clinician a focused review point.
 
 ### Domain-specific signal packs
 
@@ -461,11 +453,11 @@ Track over time
 Surface only when review is warranted
 ```
 
-A medication-related signal might connect a newly documented therapy with the measurements that are clinically relevant to that therapy. The system would then watch the patient's actual record for the presence, freshness, and direction of those signals rather than repeatedly reminding the clinician of a general medical fact.
+A medication-related signal could connect a newly documented therapy with measurements relevant to that therapy. The system could then track whether those measurements are present, current, and changing in the patient's record.
 
-For example, candesartan is associated with potassium and renal-function considerations in the product monograph. A production system could encode that relationship as a validated domain rule and then quietly track whether the relevant patient data exists and whether anything has materially changed. The clinician would see a review item only when the configured evidence condition warrants it, rather than receiving a generic alert every time candesartan appears. citeturn306366search12turn306366search15
+For example, a validated domain rule could associate a medication such as candesartan with relevant potassium and renal-function measurements. The system could track whether those measurements are available, current, and changing, then surface a review item when the configured evidence condition is met. It would not generate a generic alert each time the medication appears.
 
-The important design principle is **non-intrusive monitoring of patient-specific evidence**, not alerting clinicians about things they already know.
+The design principle is **non-intrusive monitoring of patient-specific evidence**. The system should add context when it has useful patient-specific information, not repeat general clinical knowledge.
 
 ### Longer-term data-finder agents
 
@@ -499,15 +491,15 @@ Clinical workflow / question
        Clinician review
 ```
 
-This can support longitudinal workflows without turning the agent into an autonomous clinical decision-maker.
+This can support longitudinal workflows while keeping clinical decisions with the clinician.
 
-These are **future product directions, not capabilities of the current prototype**.
+These are **future product directions**. They are not part of the current prototype.
 
 ---
 
 # A possible downstream RCM connection
 
-ChartLens is not currently a coding engine.
+ChartLens does not currently perform coding.
 
 The broader idea is that better upstream clinical context and documentation can provide better inputs to downstream workflows.
 
@@ -551,15 +543,13 @@ It:
 - rejects forbidden wording at output time
 - fails closed when evidence is insufficient
 
-The prototype is designed to support clinician review, not replace clinical judgment.
+The prototype supports clinician review. Clinical decisions remain with the clinician.
 
 ---
 
 # Privacy-oriented architecture
 
-The prototype also explores data minimization.
-
-Not every model call needs raw clinical text.
+The prototype also applies data minimization. Most model calls can operate without raw clinical text.
 
 Most analysis operates on derived signals, categories, and evidence IDs.
 
@@ -598,9 +588,9 @@ For a production deployment with real clinical data, appropriate privacy, securi
 
 # Prototype boundaries
 
-This is a **demonstration of a product direction and engineering approach**, not a production clinical system.
+This is a **product and engineering prototype**. It is not a production clinical system.
 
-The prototype currently uses:
+The prototype uses:
 
 - synthetic patient data
 - a normalized PostgreSQL model
@@ -609,7 +599,7 @@ The prototype currently uses:
 - deterministic signal analysis
 - optional LLM semantic reasoning
 
-It does not currently provide:
+Current prototype boundaries:
 
 - production EHR connectivity
 - production HL7/FHIR interfaces
@@ -679,7 +669,7 @@ frontend/
 
 # Quality and evaluation
 
-The prototype treats evaluation as part of the system rather than an afterthought.
+Evaluation is built into the system.
 
 The synthetic fixtures double as test oracles. Each patient contains expected and prohibited outcomes, including:
 
@@ -823,7 +813,7 @@ Plan:
 
 while the synthetic chart contains a rising HbA1c trend and no matching medication record.
 
-ChartLens returns evidence-linked review items rather than rewriting the note or making a clinical decision.
+ChartLens returns evidence-linked review items. The clinician remains responsible for the note and any clinical decision.
 
 Example categories:
 
@@ -833,13 +823,13 @@ medication_mismatch
 indication_mismatch
 ```
 
-The clinician remains responsible for reviewing and deciding what to change.
+The clinician reviews the evidence and decides what to change.
 
 ---
 
 # What this prototype is really demonstrating
 
-ChartLens is less about building another chatbot and more about exploring a pattern for **trustworthy, low-friction clinical AI**:
+ChartLens demonstrates a pattern for **trustworthy, low-friction clinical AI**:
 
 ```text
 Fragmented clinical information
@@ -865,9 +855,9 @@ Fragmented clinical information
 
 The longer-term idea is a **patient-context intelligence layer** that quietly maintains useful clinical context, follows meaningful signals over time, and sits beside the workflows clinicians already use.
 
-The agent is there to investigate when something warrants attention. It should not become another source of constant notifications.
+The agent investigates when a signal warrants attention. The intended experience is selective and low-noise.
 
-The prototype demonstrates the underlying engineering pattern today:
+The prototype currently demonstrates this workflow:
 
 - detect a potentially meaningful signal
 - investigate its context
@@ -876,7 +866,7 @@ The prototype demonstrates the underlying engineering pattern today:
 - show why the system surfaced it
 - leave the decision with the clinician
 
-The production product would require validated clinical workflows, real interoperability, clinical evaluation, security controls, and extensive domain collaboration.
+A production implementation would require validated clinical workflows, real interoperability, clinical evaluation, security controls, and domain collaboration.
 
 ---
 
